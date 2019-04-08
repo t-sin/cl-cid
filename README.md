@@ -2,7 +2,7 @@
 
 ## Requirements
 
-- [cmap-resources](https://github.com/adobe-type-tools/cmap-resources) in `/usr/local/share/adobe` (default location)
+- [cmap-resources](https://github.com/adobe-type-tools/cmap-resources)
 
 ## Installation
 
@@ -10,7 +10,30 @@ Locate this repository in your ASDF path or type `ros install t-sin/cl-cid` if y
 
 ## Usage
 
-TBD
+First, you should load cmap from file. `list-cmap` tells what cmap you can load.
+
+```lisp
+CL-USER> (cl-cid:list-cmap)
+("CNS1" "GB1" "Identity" "Japan1" "KR" "Korea1" "deprecated")
+```
+
+`load-cmap` loads cmap that has specified name into memory.
+
+```lisp
+CL-USER> (cl-cid:load-cmap "Japan1")
+23060  ; number of rows in cmap "Japan1"
+```
+
+`code-cid` maps specified character code to CID.
+
+```lisp
+CL-USER> (cl-cid:code-cid (char-code #\茸))
+10503  ; CID for '茸'
+
+CL-USER> (eq (char-code #\茸)
+             (cid:cid-code (cid:code-cid (char-code #\茸))))
+T
+```
 
 ## Author
 
