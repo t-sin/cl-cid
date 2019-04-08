@@ -57,7 +57,10 @@
         :do (let ((fields (apply #'vector (split-sequence #\tab line :test #'char=))))
               (if (= linum 0)
                   (setf (cmap-header cmap) (map 'vector #'to-keyword fields))
-                  (vector-push-extend (map 'vector #'parse-field fields) (cmap-table cmap)))
+                  (vector-push-extend (apply #'vector
+                                             (parse-integer (aref fields 0))
+                                             (map 'list #'parse-field (subseq fields 1)))
+                                      (cmap-table cmap)))
               (incf linum))))
     (setf *cmap* cmap)
     (length (cmap-table *cmap*))))
