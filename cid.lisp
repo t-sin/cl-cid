@@ -9,7 +9,8 @@
            #:cmap-header
            #:list-cmap
            #:load-cmap
-           #:code-cid))
+           #:code-cid
+           #:cid-code))
 (in-package #:cl-cid)
 
 (defstruct cmap
@@ -24,8 +25,21 @@
           (directory (merge-pathnames (make-pathname :name :wild :type nil)
                                       *cmap-root-pathname*))))
 
+(defun to-keyword (s)
+  (intern s :keyword))
+
+(defun parse-hex (s)
+  (flet ((hex-digit-p (c) (digit-char-p c 16)))
+    (parse-integer (remove-if-not #'hex-digit-p s) :radix 16)))
+
+(defun parse-field (s)
+  (cond ((string= s "*") nil)
+        ((find #\, s :test #'char=)
+         (map 'vector #'parse-hex (split-sequence #\, s)))
+        (t (parse-hex s))))
+
 (defun load-cmap (name)
-  (let ((cmap (make-cmap))
+  (let ((cmap (make-cmap :table (make-array 10000 :adjustable t :fill-pointer 0)))
         (map-pathname (merge-pathnames (make-pathname :name "cid2code"
                                                       :type "txt"
                                                       :directory `(:relative ,name))
@@ -37,19 +51,23 @@
         :until (eq line :eof)
         :unless (char= (char line 0) #\#)
         :do (let ((fields (apply #'vector (split-sequence #\tab line :test #'char=))))
-              (print fields)
               (if (= linum 0)
-                  (setf (cmap-header cmap)
-                        (map 'vector (lambda (name) (intern name :keyword)) fields))
-                  (push (map 'vector (lambda (v)
-                                       (if (string= v "*")
-                                           nil
-                                           (parse-integer v :radix 16)))
-                             fields)
-                        (cmap-table cmap)))
-              (incf linum))
-        :finally (setf (cmap-table cmap)
-                       (coerce (cmap-table cmap) 'vector))))
-    cmap))
+                  (setf (cmap-header cmap) (map 'vector #'to-keyword fields))
+                  (vector-push-extend (map 'vector #'parse-field fields) (cmap-table cmap)))
+              (incf linum))))
+    (setf *cmap* cmap)
+    (length (cmap-table *cmap*))))
 
-(defun code-cid (code))
+(defun code-cid (code &optional (enc :|UniJISX0213-UTF32|))
+  (let* ((column (position enc (cmap-header *cmap*)))
+         (row (find code (cmap-table *cmap*)
+                    :test #'equal
+                    :key (lambda (r) (aref r column)))))
+    (when row (aref row 0))))
+
+(defun cid-code (cid &optional (enc :|UniJISX0213-UTF32|))
+  (let ((column (position enc (cmap-header *cmap*)))
+        (row (find cid (cmap-table *cmap*)
+                   :test #'=
+                   :key (lambda (r) (aref r 0)))))
+    (when row (aref row column))))
