@@ -7,7 +7,7 @@
            #:*cmap-root-pathname*
            #:list-cmap
            #:load-cmap
-           #:->cid))
+           #:code-cid))
 (in-package #:cl-cid)
 
 (defstruct cmap
@@ -50,4 +50,4 @@
                        (coerce (cmap-table cmap) 'vector))))
     cmap))
 
-(defun ->cid (code))
+(defun code-cid (code))
