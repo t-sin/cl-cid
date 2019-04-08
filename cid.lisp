@@ -5,6 +5,8 @@
                 #:split-sequence)
   (:export #:*cmap*
            #:*cmap-root-pathname*
+           #:cmap-table
+           #:cmap-header
            #:list-cmap
            #:load-cmap
            #:code-cid))
