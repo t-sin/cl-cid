@@ -18,4 +18,4 @@ TBD
 
 ## License
 
-Umm...
+*cl-cid* is licensed under the Lisp GNU Lesser General Public License. See [COPYING](COPYING).
