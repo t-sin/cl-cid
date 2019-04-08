@@ -1,5 +1,6 @@
 (defpackage #:cl-cid
   (:nicknames #:cid)
+  (:use #:cl)
   (:import-from #:split-sequence
                 #:split-sequence)
   (:export #:*cmap*
