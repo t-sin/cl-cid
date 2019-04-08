@@ -9,6 +9,7 @@
            #:cmap-header
            #:list-cmap
            #:load-cmap
+           #:clear-cmap
            #:code-cid
            #:cid-code))
 (in-package #:cl-cid)
@@ -19,6 +20,9 @@
 (defparameter *cmap* nil)
 (defparameter *cmap-root-pathname*
   (make-pathname :directory "/usr/local/share/adobe/resources/mapping/"))
+
+(defun clear-cmap ()
+  (setf *cmap* nil))
 
 (defun list-cmap ()
   (mapcar (lambda (p) (car (last (pathname-directory p))))
