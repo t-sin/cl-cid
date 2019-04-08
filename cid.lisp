@@ -5,6 +5,8 @@
                 #:split-sequence)
   (:export #:*cmap*
            #:*cmap-root-pathname*
+           #:list-cmap
+           #:load-cmap
            #:->cid))
 (in-package #:cl-cid)
 
@@ -14,6 +16,11 @@
 (defparameter *cmap* nil)
 (defparameter *cmap-root-pathname*
   (make-pathname :directory "/usr/local/share/adobe/resources/mapping/"))
+
+(defun list-cmap ()
+  (mapcar (lambda (p) (car (last (pathname-directory p))))
+          (directory (merge-pathnames (make-pathname :name :wild :type nil)
+                                      *cmap-root-pathname*))))
 
 (defun load-cmap (name)
   (let ((cmap (make-cmap))
